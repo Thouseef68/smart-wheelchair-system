@@ -1,30 +1,31 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { auth } from '@/firebase';
-import { onAuthStateChanged, User } from 'firebase/auth'; // Added User type import
-import AuthScreen from '@/components/Auth';
-import DashboardScreen from '@/components/Dashboard';
+import { auth } from '@/firebase'; // Points to your firebase.js
+import { onAuthStateChanged, User } from 'firebase/auth'; 
+import AuthScreen from '@/components/Auth'; //
+import DashboardScreen from '@/components/Dashboard'; //
 
 export default function Page() {
-  // FIXED: Explicitly defined types for the state
+  // FIXED: Explicitly define types to satisfy the TypeScript compiler
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // onAuthStateChanged returns a User object or null
+    // Listens for login/logout events
     const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setUser(u); // TypeScript now accepts 'u' because we defined the type above
+      setUser(u);
       setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
+  // Professional Medical-Theme Loader
   if (loading) return (
     <div className="h-screen flex items-center justify-center bg-slate-950 font-mono text-blue-500 animate-pulse tracking-[0.5em]">
       SYSTEM_INITIALIZING...
     </div>
   );
 
-  // Switch between Dashboard and Auth based on user state
+  // Switch between Dashboard and Auth based on user session
   return user ? <DashboardScreen /> : <AuthScreen />;
 }
